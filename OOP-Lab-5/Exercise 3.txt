@@ -1,0 +1,11 @@
+A)
+1) Polymorphic behavior is showed by call 2
+2) Polymorphic behavior is showed by call 2 and call 3
+3) Polymorphic behavior is showed by call 2
+
+B)
+1)The delete function is not used with [] brackets. This leads to memory leak
+2)Error
+3)memory leak
+4)delocatting from heap which leads to error
+5)Two destructors which leads to an error
