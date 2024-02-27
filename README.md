@@ -1,2 +1,2 @@
-# Raylib-Projects
-The projects I have done using the Raylib library for C/C++
+# CPP-Projects
+The projects and assignments I have done in C++
