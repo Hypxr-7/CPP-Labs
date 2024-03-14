@@ -1,0 +1,23 @@
+(a)
+1. d is created in main
+2. A copy of d is created to call function A
+3. Inside A, a another copy of d is created to call function B
+4. Inside B, a another copy of d is created to call function C
+5. The copy of d in function C is destroyed as the function ends due to an exception
+6. The copy of d in function B is destroyed as the function ends due to an exception
+7. The copy of d in function A is destroyed as the function ends due to an exception
+8. Main end and d is destroyed
+
+(b)
+None of the functions A, B, or C would have completed their execution as C is throwing an exception which will cause all the automatic variables between this throw and the catch block (in main) to be destroyed. i.e. stack unwinding
+
+(c)
+The pointer will not be deleted as satck unwinding will terminate the function before the delete statement is reached. This results in a memory leak
+
+(d)
+All functions A, B, and C are fully executed and the catch block in main is skipped
+
+(e)
+The code will not compile as the try block requires at least one follow up catch block.
+If both the try and catch block are removed and replaced only with the statements inside the try block, the code will terminate after the exception is throwing
+If we also remove the throw statement in function C, then the code will execute with no problems
