@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <string>
 
 using std::cout, std::endl, std::string, std::vector, std::to_string;
 
