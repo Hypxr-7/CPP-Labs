@@ -65,8 +65,8 @@ void josephusProblem(int n, int m) {
 }
 
 int main() {
-    // int n = 5, m = 2;
-    int n = 7, m = 3;
+    int n = 5, m = 2;
+    // int n = 7, m = 3;
 
     josephusProblem(n, m);
 
