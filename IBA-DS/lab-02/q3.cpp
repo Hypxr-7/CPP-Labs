@@ -1,10 +1,12 @@
+// * as shown in q3.pdf, this algorithm is not O(n²log(n)) but O(n³) 
+
 #include <iostream>
 #include <vector>
 #include <random>
 #include <ctime>
 #include <functional>
 
-constexpr int N = 250;
+constexpr int N = 1000;
 
 std::vector<int> initVector();
 int threeSum(const std::vector<int>& v);
