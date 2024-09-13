@@ -1,49 +1,70 @@
 #pragma once
 
-template<typename T>
-class RAStack {
+template <typename Item>
+class ResizingArrayStack {
 private:
-    T* stk;
-    int n;
-    int cap;
+    Item* a;       // array of items
+    int n;         // number of elements on stack
+    int capacity;  // size of the array
 
-    void resize() {
-        cap *= 2;
-        T* copy =  new T[cap];
-
+    // resize the underlying array holding the elements
+    void resize(int new_capacity) {
+        Item* temp = new Item[new_capacity];
         for (int i = 0; i < n; ++i) {
-            copy[i] = stk[i];
+            temp[i] = a[i];
         }
-
-        delete[] stk;
-        stk = copy;
-
+        delete[] a;
+        a = temp;
+        capacity = new_capacity;
     }
 
 public:
-    RAStack() : stk(new T[2]), n(0), cap(2) {} 
-    
-    ~RAStack() {
-        delete[] stk;
+    // Constructor to initialize an empty stack
+    ResizingArrayStack() : n(0), capacity(8) {
+        a = new Item[capacity];
     }
 
-    void push(T item) {
-        if (cap == n) {
-            resize();
-        }
-        stk[n++] = item;
+    // Destructor to free memory
+    ~ResizingArrayStack() {
+        delete[] a;
     }
 
-    T pop() {
-        if (isEmpty()) throw std::out_of_range("stack is empty");
-        return stk[--n];
-    }
-
-    bool isEmpty() {
+    // Check if the stack is empty
+    bool isEmpty() const {
         return n == 0;
     }
 
-    int size() {
+    // Return the number of items in the stack
+    int size() const {
         return n;
+    }
+
+    // Add the item to this stack
+    void push(const Item& item) {
+        if (n == capacity) {
+            resize(2 * capacity);  // double size of array if necessary
+        }
+        a[n++] = item;
+    }
+
+    // Remove and return the item most recently added to this stack
+    Item pop() {
+        if (isEmpty()) {
+            throw std::out_of_range("Stack underflow");
+        }
+        Item item = a[--n];
+        a[n] = Item();  // optional: avoid loitering
+        if (n > 0 && n == capacity / 4) {
+            resize(capacity / 2);  // shrink array size if necessary
+        }
+        return item;
+    }
+
+    // Return (but do not remove) the item most recently added to this stack
+    Item peek() const {
+        if (isEmpty()) {
+            throw std::out_of_range("Stack underflow");
+        }
+        return a[n - 1];
     }
 };

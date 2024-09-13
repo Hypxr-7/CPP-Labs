@@ -1,58 +1,60 @@
 #include <iostream>
+#include <cassert>
 #include "02-RAStack.hpp"
 
-void testRAStack() {
-    RAStack<int> stack;
+void testResizingArrayStack() {
+    ResizingArrayStack<int> stack;
 
     // Test isEmpty on a new stack
-    if (stack.isEmpty()) {
-        std::cout << "Test 1 Passed: Stack is empty on initialization." << std::endl;
-    } else {
-        std::cout << "Test 1 Failed: Stack is not empty on initialization." << std::endl;
-    }
+    assert(stack.isEmpty());
+    assert(stack.size() == 0);
 
     // Test push and size
-    stack.push(10);
-    stack.push(20);
-    if (stack.size() == 2) {
-        std::cout << "Test 2 Passed: Stack size is correct after two pushes." << std::endl;
-    } else {
-        std::cout << "Test 2 Failed: Stack size is incorrect after two pushes." << std::endl;
-    }
+    stack.push(1);
+    assert(!stack.isEmpty());
+    assert(stack.size() == 1);
+    assert(stack.peek() == 1);
+
+    stack.push(2);
+    assert(stack.size() == 2);
+    assert(stack.peek() == 2);
 
     // Test pop
-    int poppedValue = stack.pop();
-    if (poppedValue == 20) {
-        std::cout << "Test 3 Passed: Popped value is correct." << std::endl;
-    } else {
-        std::cout << "Test 3 Failed: Popped value is incorrect." << std::endl;
-    }
+    int item = stack.pop();
+    assert(item == 2);
+    assert(stack.size() == 1);
+    assert(stack.peek() == 1);
 
-    // Test size after pop
-    if (stack.size() == 1) {
-        std::cout << "Test 4 Passed: Stack size is correct after one pop." << std::endl;
-    } else {
-        std::cout << "Test 4 Failed: Stack size is incorrect after one pop." << std::endl;
-    }
+    item = stack.pop();
+    assert(item == 1);
+    assert(stack.isEmpty());
+    assert(stack.size() == 0);
 
-    // Test isEmpty after pop
-    stack.pop();
-    if (stack.isEmpty()) {
-        std::cout << "Test 5 Passed: Stack is empty after popping all elements." << std::endl;
-    } else {
-        std::cout << "Test 5 Failed: Stack is not empty after popping all elements." << std::endl;
-    }
-
-    // Test exception on pop from empty stack
+    // Test underflow
     try {
         stack.pop();
-        std::cout << "Test 6 Failed: No exception thrown on pop from empty stack." << std::endl;
+        assert(false);  // Should not reach here
     } catch (const std::out_of_range& e) {
-        std::cout << "Test 6 Passed: Exception thrown on pop from empty stack." << std::endl;
+        assert(true);  // Expected exception
     }
+
+    // Test resizing
+    for (int i = 0; i < 100; ++i) {
+        stack.push(i);
+    }
+    assert(stack.size() == 100);
+    assert(stack.peek() == 99);
+
+    for (int i = 99; i >= 0; --i) {
+        assert(stack.pop() == i);
+    }
+    assert(stack.isEmpty());
+    assert(stack.size() == 0);
+
+    std::cout << "All tests passed!" << std::endl;
 }
 
 int main() {
-    testRAStack();
+    testResizingArrayStack();
     return 0;
 }
