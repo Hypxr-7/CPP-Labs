@@ -1,0 +1,36 @@
+void stable_partition(vector<int>& a, const int& pivot)
+
+//Make two temporary vectors
+	- One for smaller or equal elements than the pivot (vector<int> lesser)
+	- One for larger elements than the pivot (vector<int> greater)
+
+
+ // First pass: collect elements less than or equal to the pivot and push_back in lesser vector.
+
+// Second pass: collect elements greater than the pivot and push_back in greater vector.
+
+ // Combine the results back into the original array 
+
+	- first push the lesser vector
+	- Then push the greater vector
+
+
+
+Example: 
+
+Original array:
+3 7 2 8 6 4 5 1
+
+
+Array after stable partitioning (pivot = 4):
+3 2 4 1 7 8 6 5
+
+Elements ≤ 4:
+
+In the original array, the elements that are less than or equal to 4 are: 3, 2, 4, 1.
+After partitioning, these elements appear first in the output array in exactly the same order as in the original array: 3, 2, 4, 1.
+
+Elements > 4:
+
+The elements that are greater than 4 are: 7, 8, 6, 5.
+After partitioning, these elements appear later in the array, also in the same relative order as they were in the original array: 7, 8, 6, 5.

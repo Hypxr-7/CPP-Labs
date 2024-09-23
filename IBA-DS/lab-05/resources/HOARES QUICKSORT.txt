@@ -1,0 +1,53 @@
+Hoare's original quicksort algorithm sorts an array by choosing a pivot (typically the first element) and then rearranging the elements so that those smaller than the pivot are on one side and those larger are on the other. Unlike some versions where the pivot is moved to its final sorted position right away, Hoare's method does not fix the pivot's position initially. Instead, it just helps to divide the array into parts. The algorithm then recursively sorts these parts without moving the pivot to its final place. This approach focuses on efficiently rearranging elements around the pivot and sorting the resulting subarrays.
+
+
+//First Function : Hoare's Quicksort Initialization
+
+Function hoare_quicksort(array)
+    Shuffle array to ensure average-case performance
+    hoare_quicksort(array, 0, size of array - 1)
+End Function
+
+
+//Second Function: Hoare's Quicksort Function
+
+Function hoare_quicksort(array, lo, hi)
+    
+	// Base case: array of size 1 or empty
+    
+	// Partition the array and get the partition index
+    		partition_index = hoare_partition(array, lo, hi)
+    
+    
+	// Recursively sort the left subarray
+    		hoare_quicksort(array, lo, partition_index)
+    
+    	// Recursively sort the right subarray
+    		hoare_quicksort(array, partition_index + 1, hi)
+End Function
+
+
+// Third Function: Hoare's Partition Function
+
+Function hoare_partition(array, lo, hi)
+
+        // Choose the first element as the pivot
+        // Pointer for elements less than or equal to pivot (i = lo-1)
+        // Pointer for elements greater than pivot (j = hi+1)
+
+Two pointers (i and j) are used to traverse the array:
+
+	- i starts from the left and moves right, finding elements that should be on the right side (elements that are greater than or 		  equal to the pivot).
+
+	- j starts from the right and moves left, finding elements that should be on the left side (elements that are smaller than or 	     	  equal to the pivot).
+	
+	- When both pointers find elements on the wrong side, they are swapped.
+	
+	- The loop continues until the two pointers meet or cross, at which point the function returns j, which acts as the partition 	 	  index.
+
+Example of partitioning:
+
+- Array: [9, 5, 2, 8, 7] with pivot 9
+- i moves right to the first element >= pivot (in this case, none, since 9 is already the largest).
+- j moves left to the first element <= pivot.
+- Swaps happen, making sure that elements smaller than the pivot go to the left.

@@ -1,0 +1,75 @@
+void dual_sort(vector<int>& a, int lo, int hi)
+
+//STEP 1
+//Base Case:
+if(hi<=lo)
+{
+  return;
+}
+
+
+//STEP 2
+
+//Selecting first and last element of array as two pivots, if first element is greater than the last swap them and then assign it to the 
+pivot1 and pivot2.
+
+int pivot1= a[lo];
+int pivot2= a[hi];
+
+
+//STEP 3
+//Now selecting the boundary pointers for the three partitions.
+
+1. For elements less than the pivot1 (int lt = lo+1) 
+
+    lt (left pointer): It starts just after the left pivot (lo + 1) and helps keep track 
+    of the section of the array where the elements are less than the first pivot (pivot1). 
+    As we find elements smaller than pivot1, we move them to the left part of the array and increase lt.
+
+ 
+2. For elements greater than the pivot2 (int gt= hi-1)  
+
+    gt (right pointer): It starts just before the right pivot (hi - 1) and helps keep 
+    track of the section of the array where the elements are greater than the second pivot (pivot2). 
+    As we find elements larger than pivot2, we move them to the right part of the array and decrease gt.
+
+3. For scanning the elements from lo+1 to hi-1 (i)  
+
+    It checks each element to see if it belongs in the left part (less than pivot1), the middle part (between the pivots), 
+    or the right part (greater than pivot2).
+
+
+//STEP 4
+Partitioning Loop (Purpose: This loop rearranges elements so that Elements less than pivot1 are moved to the left side, Elements greater than pivot2 are moved to the right side, AND Elements between pivot1 and pivot2 stay in the middle
+
+
+/*Logic:
+
+      -   If a[i] < pivot1: The element belongs to the left partition (less than pivot1). It swaps a[i] with a[lt], 
+          then increments both i and lt to move to the next elements.
+        
+      -   If a[i] > pivot2: The element belongs to the right partition (greater than pivot2). 
+          It swaps a[i] with a[gt] and decrements gt to expand the right partition. Notice that 
+          i is not incremented because we still need to check the swapped element at position i.
+        
+      -   If the element is between the pivots (pivot1 ≤ a[i] ≤ pivot2), it is in the correct middle partition, 
+          and i is simply incremented.
+
+
+
+//STEP 5
+//Placing the Pivots
+        
+    /*Purpose: Move pivot1 and pivot2 to their correct positions.
+     - Move lt one step to the left and place pivot1 in its correct position BY SWAPPING EACHOTHER.
+     - Move gt one step to the right and place pivot2 in its correct position BY SWAPPING EACHOTHER.
+
+
+//STEP 6 
+//Recursive Sorting
+    
+    /*Purpose: Recursively sort the three parts of the array:
+        - Left of pivot1: lo to lt - 1
+        - Between pivot1 and pivot2: lt + 1 to gt - 1
+        - Right of pivot2: gt + 1 to hi*/
+
