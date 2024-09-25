@@ -3,7 +3,7 @@
 #include <algorithm>
 
 template <typename Item>
-class MaxPQ {
+class MinPQ {
 private:
     Item* pq;  // store items at indices 1 to n
     int n;     // number of items on priority queue
@@ -20,7 +20,7 @@ private:
     }
 
     void swim(int k) {
-        while (k > 1 && pq[k / 2] < pq[k]) {
+        while (k > 1 && pq[k / 2] > pq[k]) {
             std::swap(pq[k / 2], pq[k]);
             k = k / 2;
         }
@@ -29,17 +29,17 @@ private:
     void sink(int k) {
         while (2 * k <= n) {
             int j = 2 * k;
-            if (j < n && pq[j] < pq[j + 1]) ++j;
-            if (pq[k] >= pq[j]) break;
+            if (j < n && pq[j] > pq[j + 1]) ++j;
+            if (pq[k] <= pq[j]) break;
             std::swap(pq[k], pq[j]);
             k = j;
         }
     }
 
 public:
-    MaxPQ(int capacity = 8) : pq(new Item[capacity + 1]), n(0), cap(capacity) {}
+    MinPQ(int capacity = 8) : pq(new Item[capacity + 1]), n(0), cap(capacity) {}
 
-    MaxPQ(std::initializer_list<Item> keys) {
+    MinPQ(std::initializer_list<Item> keys) {
         n = keys.size();
         cap = n;
         pq = new Item[n + 1];
@@ -52,7 +52,7 @@ public:
         }
     }
 
-    ~MaxPQ() {
+    ~MinPQ() {
         delete[] pq;
     }
 
@@ -64,7 +64,7 @@ public:
         return n;
     }
 
-    Item max() const {
+    Item min() const {
         if (isEmpty()) throw std::runtime_error("Priority queue underflow");
         return pq[1];
     }
@@ -75,13 +75,13 @@ public:
         swim(n);
     }
 
-    Item delMax() {
+    Item delMin() {
         if (isEmpty()) throw std::runtime_error("Priority queue underflow");
-        Item max = pq[1];
+        Item min = pq[1];
         std::swap(pq[1], pq[n--]);
         sink(1);
         pq[n + 1] = Item();  // to avoid loitering 
         if ((n > 0) && (n == (cap - 1) / 4)) resize(cap / 2);
-        return max;
+        return min;
     }
 };

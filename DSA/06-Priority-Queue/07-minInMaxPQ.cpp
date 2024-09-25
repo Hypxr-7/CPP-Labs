@@ -1,6 +1,8 @@
-#include <initializer_list>
-#include <stdexcept>
 #include <algorithm>
+#include <cassert>
+#include <initializer_list>
+#include <iostream>
+#include <stdexcept>
 
 template <typename Item>
 class MaxPQ {
@@ -8,6 +10,7 @@ private:
     Item* pq;  // store items at indices 1 to n
     int n;     // number of items on priority queue
     int cap;   // capacity of the priority queue
+    Item minItem; // store the minimum item
 
     void resize(int capacity) {
         cap = capacity;
@@ -37,7 +40,7 @@ private:
     }
 
 public:
-    MaxPQ(int capacity = 8) : pq(new Item[capacity + 1]), n(0), cap(capacity) {}
+    MaxPQ(int capacity = 8) : pq(new Item[capacity + 1]), n(0), cap(capacity), minItem(Item()) {}
 
     MaxPQ(std::initializer_list<Item> keys) {
         n = keys.size();
@@ -46,6 +49,9 @@ public:
         int i = 1;
         for (const Item& key : keys) {
             pq[i++] = key;
+            if (i == 2 || key < minItem) {
+                minItem = key;
+            }
         }
         for (int k = n / 2; k >= 1; --k) {
             sink(k);
@@ -69,10 +75,18 @@ public:
         return pq[1];
     }
 
+    Item min() const {
+        if (isEmpty()) throw std::runtime_error("Priority queue underflow");
+        return minItem;
+    }
+
     void insert(const Item& x) {
         if (n == cap) resize(2 * cap);
         pq[++n] = x;
         swim(n);
+        if (n == 1 || x < minItem) {
+            minItem = x;
+        }
     }
 
     Item delMax() {
@@ -82,6 +96,61 @@ public:
         sink(1);
         pq[n + 1] = Item();  // to avoid loitering 
         if ((n > 0) && (n == (cap - 1) / 4)) resize(cap / 2);
+        if (n == 0) {
+            minItem = Item(); // reset minItem if the priority queue is empty
+        }
         return max;
     }
 };
+
+void testMinInEmptyPQ() {
+    MaxPQ<int> pq;
+    try {
+        pq.min();
+        assert(false); // Should not reach here
+    } catch (const std::runtime_error& e) {
+        assert(std::string(e.what()) == "Priority queue underflow");
+    }
+}
+
+void testMinInSingleElementPQ() {
+    MaxPQ<int> pq;
+    pq.insert(42);
+    assert(pq.min() == 42);
+}
+
+void testMinInMultipleElementsPQ() {
+    MaxPQ<int> pq;
+    pq.insert(42);
+    pq.insert(15);
+    pq.insert(23);
+    pq.insert(8);
+    pq.insert(16);
+    assert(pq.min() == 8);
+}
+
+void testMinAfterDelMax() {
+    MaxPQ<int> pq;
+    pq.insert(42);
+    pq.insert(15);
+    pq.insert(23);
+    pq.insert(8);
+    pq.insert(16);
+    pq.delMax();
+    assert(pq.min() == 8);
+}
+
+void testMinWithInitializerList() {
+    MaxPQ<int> pq = {42, 15, 23, 8, 16};
+    assert(pq.min() == 8);
+}
+
+int main() {
+    testMinInEmptyPQ();
+    testMinInSingleElementPQ();
+    testMinInMultipleElementsPQ();
+    testMinAfterDelMax();
+    testMinWithInitializerList();
+    std::cout << "All tests passed!" << std::endl;
+    return 0;
+}
