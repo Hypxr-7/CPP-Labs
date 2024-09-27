@@ -4,13 +4,12 @@
 #include <vector>
 #include "MedianPQ.hpp"
 
-
 int main() {
     // Generate vector with random values
     std::vector<int> v(11);
     std::mt19937 mt(std::random_device{}());
     std::uniform_int_distribution<int> dist(0, 50);
-    auto rn = [&](){ return dist(mt); };
+    auto rn = [&]() -> int { return dist(mt); };
     std::generate(v.begin(), v.end(), rn);
 
     // Pass all values in MedianPQ
@@ -32,11 +31,4 @@ int main() {
     std::cout << "New Median after Removal: " << mpq.getMedian() << '\n';
 
     return 0;
-}
-
-
-int randNum() {
-    static std::mt19937 mt(std::random_device{}());
-    static std::uniform_int_distribution<int> dist(0, 50);
-    return dist(mt);
 }
