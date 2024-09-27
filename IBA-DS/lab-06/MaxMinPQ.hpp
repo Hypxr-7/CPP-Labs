@@ -1,127 +1,132 @@
-#include <algorithm>
+#include <vector>
+#include <unordered_map>
 #include <stdexcept>
+#include <algorithm>
 
 template <typename Item>
 class MaxMinPQ {
 private:
-    Item* pqMax;
-    Item* pqMin;
-    int n;
-    int cap;
+    std::vector<Item> pqMin;  // Min-heap
+    std::vector<Item> pqMax;  // Max-heap
+    std::unordered_map<Item, int> minIndexMap;  // Map to store indices in min-heap
+    std::unordered_map<Item, int> maxIndexMap;  // Map to store indices in max-heap
+    int n;  // Number of items in the priority queue
+    int cap;  // Capacity of the priority queue
 
-    void resize(int newCap) {
-        cap = newCap;
-        Item* tempMax = new Item[newCap + 1];
-        Item* tempMin = new Item[newCap + 1];
-        for (int i = 0; i <= n; ++i) {
-            tempMax[i] = pqMax[i];
-            tempMin[i] = pqMin[i]; 
-        }
-
-        delete[] pqMax;
-        delete[] pqMin;
-
-        pqMax = tempMax;
-        pqMin = tempMin;
+    void resize(int capacity) {
+        pqMin.resize(capacity + 1);
+        pqMax.resize(capacity + 1);
+        cap = capacity;
     }
 
-    void sinkMax(int k) {
-        while (2 * k <= n) {
-            int j = 2 * k;
-            if (j < n && pqMax[j] < pqMax[j + 1]) ++j;
-            if (pqMax[k] >= pqMax[j]) break;
-            std::swap(pqMax[k], pqMax[j]);
-            k = j;
+    void swimMin(int k) {
+        while (k > 1 && pqMin[k] < pqMin[k / 2]) {
+            std::swap(pqMin[k], pqMin[k / 2]);
+            minIndexMap[pqMin[k]] = k;
+            minIndexMap[pqMin[k / 2]] = k / 2;
+            k = k / 2;
         }
     }
 
     void sinkMin(int k) {
         while (2 * k <= n) {
             int j = 2 * k;
-            if (j < n && pqMin[j] > pqMin[j + 1]) ++j;
+            if (j < n && pqMin[j] > pqMin[j + 1]) j++;
             if (pqMin[k] <= pqMin[j]) break;
             std::swap(pqMin[k], pqMin[j]);
+            minIndexMap[pqMin[k]] = k;
+            minIndexMap[pqMin[j]] = j;
             k = j;
         }
     }
-    
+
     void swimMax(int k) {
-        while (k > 1 && pqMax[k / 2] < pqMax[k]) {
-            std::swap(pqMax[k / 2], pqMax[k]);
+        while (k > 1 && pqMax[k] > pqMax[k / 2]) {
+            std::swap(pqMax[k], pqMax[k / 2]);
+            maxIndexMap[pqMax[k]] = k;
+            maxIndexMap[pqMax[k / 2]] = k / 2;
             k = k / 2;
         }
     }
-    
-    void swimMin(int k) {
-        while (k > 1 && pqMin[k / 2] > pqMin[k]) {
-            std::swap(pqMin[k / 2], pqMin[k]);
-            k = k / 2;
+
+    void sinkMax(int k) {
+        while (2 * k <= n) {
+            int j = 2 * k;
+            if (j < n && pqMax[j] < pqMax[j + 1]) j++;
+            if (pqMax[k] >= pqMax[j]) break;
+            std::swap(pqMax[k], pqMax[j]);
+            maxIndexMap[pqMax[k]] = k;
+            maxIndexMap[pqMax[j]] = j;
+            k = j;
         }
     }
 
 public:
-    MaxMinPQ(int capacity=8) : pqMax(new Item[cap + 1]), pqMin(new Item[cap + 1]), n(0), cap(capacity) {}
+    MaxMinPQ(int capacity = 8) : pqMin(capacity + 1), pqMax(capacity + 1), n(0), cap(capacity) {}
 
-    ~MaxMinPQ() {
-        delete[] pqMax;
-        delete[] pqMin;
+    bool isEmpty() const {
+        return n == 0;
     }
 
-    void insert(const Item& x) {
-        if (n == cap) resize(2 * cap);
-        
-        pqMax[++n] = x;
-        pqMin[n] = x;
-
-        swimMax(n);
-        swimMin(n);
+    int size() const {
+        return n;
     }
 
-    Item max() {
-        if (isEmpty()) throw std::runtime_error("Priority queue underflow");
-        return pqMax[1];
-    }
-
-    Item min() {
+    Item min() const {
         if (isEmpty()) throw std::runtime_error("Priority queue underflow");
         return pqMin[1];
     }
 
-    Item delMax() {
-        Item maxItem = pqMax[1];
-        std::swap(pqMax[1], pqMax[n--]);
-        sinkMax(1);
+    Item max() const {
+        if (isEmpty()) throw std::runtime_error("Priority queue underflow");
+        return pqMax[1];
+    }
 
-        for (int i = 1; i <= n + 1; ++i) {
-            if (pqMin[i] == maxItem) {
-                std::swap(pqMin[i], pqMin[n + 1]);
-                break;
-            }
-        }
-        sinkMin(1);
-
-        if (n > 0 && n == (cap - 1) / 4) resize(cap / 2);
-        return maxItem;
+    void insert(const Item& x) {
+        if (n == cap) resize(2 * cap);
+        pqMin[++n] = x;
+        pqMax[n] = x;
+        minIndexMap[x] = n;
+        maxIndexMap[x] = n;
+        swimMin(n);
+        swimMax(n);
     }
 
     Item delMin() {
+        if (isEmpty()) throw std::runtime_error("Priority queue underflow");
         Item minItem = pqMin[1];
-        std::swap(pqMin[1], pqMin[n--]);
+        std::swap(pqMin[1], pqMin[n]);
+        minIndexMap[pqMin[1]] = 1; // update index
+        minIndexMap.erase(minItem);
+        n--;
         sinkMin(1);
 
-        for (int i = 1; i <= n + 1; ++i) {
-            if (pqMax[i] == minItem) {
-                std::swap(pqMax[i], pqMax[n + 1]);
-                break;
-            }
-        }
-        sinkMax(1);
+        int maxIndex = maxIndexMap[minItem]; // find index of max item
+        std::swap(pqMax[maxIndex], pqMax[n + 1]); // swap to end
+        maxIndexMap[pqMax[maxIndex]] = maxIndex; // update index
+        maxIndexMap.erase(minItem); //remove item
+        sinkMax(maxIndex);
 
         if (n > 0 && n == (cap - 1) / 4) resize(cap / 2);
         return minItem;
     }
 
-    bool isEmpty() { return n == 0; }
+    Item delMax() {
+        if (isEmpty()) throw std::runtime_error("Priority queue underflow");
+        Item maxItem = pqMax[1];
+        std::swap(pqMax[1], pqMax[n]);
+        maxIndexMap[pqMax[1]] = 1;
+        maxIndexMap.erase(maxItem);
+        n--;
+        sinkMax(1);
 
-    int size() { return n; }
+        int minIndex = minIndexMap[maxItem]; 
+        std::swap(pqMin[minIndex], pqMin[n + 1]); 
+        minIndexMap[pqMin[minIndex]] = minIndex;
+        minIndexMap.erase(maxItem);
+        sinkMin(minIndex);
+
+        if (n > 0 && n == (cap - 1) / 4) resize(cap / 2);
+        return maxItem;
+    }
 };
