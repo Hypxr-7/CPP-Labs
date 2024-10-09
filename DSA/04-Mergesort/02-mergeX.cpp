@@ -50,10 +50,7 @@ void mergesort(std::vector<T>& src, std::vector<T>& dst, int low, int high) {
     mergesort(dst, src, mid + 1, high);
 
     // improvement 2: skips recursive call if already sorted
-    if (src[mid + 1] >= src[mid]) {
-        std::copy(src.begin() + low, src.begin() + high + 1, dst.begin() + low);
-        return;
-    }
+    if (src[mid + 1] >= src[mid]) return;
 
     merge(src, dst, low, mid, high);
 }
