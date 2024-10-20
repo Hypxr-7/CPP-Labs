@@ -1,2 +1,3 @@
-# CPP-Projects
-The projects and assignments I have done in C++
+# CPP-Labs
+
+The labs and assignments I have done in C++
