@@ -11,7 +11,13 @@ class BST {
         Value val;
         Node *left, *right;
         int count;
-        Node(Key k, Value v, int c=1) : key{k}, val{v}, left{nullptr}, right{nullptr}, count{c} {  }
+        int height;
+        Node(Key k, Value v, int c=1, int h=0) : key{k}, 
+                                                val{v}, 
+                                                left{nullptr}, 
+                                                right{nullptr}, 
+                                                count{c},
+                                                height{h} {}
     };
 
     Node* root;
@@ -101,7 +107,7 @@ private:
     // private helper functions
 
     Node* put(Node* x, const Key& key, const Value& val)  {
-        if (x == nullptr) return new Node(key, val, 1);
+        if (x == nullptr) return new Node(key, val, 1, 0);
         
         if (key < x->key)  
             x->left  = put(x->left,  key, val);
@@ -110,6 +116,12 @@ private:
         else                    
             x->val = val;
         x->count = 1 + size(x->left) + size(x->right);
+        if (x->left != nullptr && x->right != nullptr)
+            x->height = 1 + std::max(x->left->height, x->right->height);
+        else if (x->left == nullptr && x->right != nullptr)
+            x->height = 1 + x->right->height;
+        else if (x->left != nullptr && x->right == nullptr)
+            x->height = 1 + x->left->height;
         return x;
     }
 
@@ -168,6 +180,12 @@ private:
         }
         x->left  = removeMin(x->left);
         x->count = 1 + size(x->left) + size(x->right);
+        if (x->left != nullptr && x->right != nullptr)
+            x->height = 1 + std::max(x->left->height, x->right->height);
+        else if (x->left == nullptr && x->right != nullptr)
+            x->height = 1 + x->right->height;
+        else if (x->left != nullptr && x->right == nullptr)
+            x->height = 1 + x->left->height;
         return x;
     }
 
@@ -188,6 +206,12 @@ private:
             x->left = t->left;
         } 
         x->count = size(x->left) + size(x->right) + 1;
+        if (x->left != nullptr && x->right != nullptr)
+            x->height = 1 + std::max(x->left->height, x->right->height);
+        else if (x->left == nullptr && x->right != nullptr)
+            x->height = 1 + x->right->height;
+        else if (x->left != nullptr && x->right == nullptr)
+            x->height = 1 + x->left->height;
         return x;
     } 
 
@@ -203,6 +227,8 @@ private:
  ************************************************************************************/
 
 public:
+    int height_constant() { return root->height; }
+
     int height_recursive() const {
         return height_recursive(root);
     }
@@ -316,7 +342,16 @@ private:
             return temp;
         }
         node->right = deleteMax(node->right);
+
         node->count = size(node->left) + size(node->right) + 1;
+
+        if (node->left != nullptr && node->right != nullptr)
+            node->height = 1 + std::max(node->left->height, node->right->height);
+        else if (node->left == nullptr && node->right != nullptr)
+            node->height = 1 + node->right->height;
+        else if (node->left != nullptr && node->right == nullptr)
+            node->height = 1 + node->left->height;
+
         return node;
     }
 /************************************************************************************
@@ -357,9 +392,22 @@ private:
 public:
     void test() {
         assert(isBST(root));
+        assert(isSizeConsistent(root));
     }
+
 /************************************************************************************
  * Question 5
+ ************************************************************************************/
+
+private:
+    bool isSizeConsistent(Node* node) {
+        if (node == nullptr) return true;
+        if (node->count != 1 + size(node->left) + size(node->right)) return false;
+        return isSizeConsistent(node->left) && isSizeConsistent(node->right);
+    }
+
+/************************************************************************************
+ * Question 6
  ************************************************************************************/
 public:
     bool isRankConsistent() {
